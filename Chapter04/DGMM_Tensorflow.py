@@ -74,7 +74,7 @@ else:
     original_img_size = (img_rows, img_cols, img_chns)#28, 28, 1
 
 
-# In[]: Building the architechture vae
+# In[]: Building the architechture vae : encoder
 X = Input(shape=original_img_size)
 Y = Input(shape=(D2,))#fmri
 Y_mu = Input(shape=(D2,))
@@ -110,7 +110,7 @@ def sampling(args):
 
 Z = Lambda(sampling, output_shape=(K,))([Z_mu, Z_lsgms])
 
-# In[]: we instantiate these layers separately so as to reuse them later
+# In[]: we instantiate these layers separately so as to reuse them later : decoder
 decoder_hid = Dense(intermediate_dim, activation='relu')
 decoder_upsample = Dense(filters * 14 * 14, activation='relu')
 
@@ -159,7 +159,7 @@ x_decoded_relu = decoder_deconv_3_upsamp(deconv_2_decoded)
 X_mu = decoder_mean_squash_mu (x_decoded_relu)
 X_lsgms = decoder_mean_squash_lsgms (x_decoded_relu)
 
-# In[]:define objective function
+# In[]:define loss function
 logc = np.log(2 * np.pi).astype(np.float32)
 def X_normal_logpdf(x, mu, lsgms):
     lsgms = backend.flatten(lsgms)   
@@ -168,7 +168,7 @@ def X_normal_logpdf(x, mu, lsgms):
 def Y_normal_logpdf(y, mu, lsgms):  
     return backend.mean(-(0.5 * logc + 0.5 * lsgms) - 0.5 * ((y - mu)**2 / backend.exp(lsgms)), axis=-1)
    
-def obj(X, X_mu):
+def obj(X, X_mu):#loss function
     X = backend.flatten(X)
     X_mu = backend.flatten(X_mu)
     
@@ -207,7 +207,7 @@ X_mu_predict = decoder_mean_squash_mu(_x_decoded_relu)
 X_lsgms_predict = decoder_mean_squash_mu(_x_decoded_relu)
 imagereconstruct = Model(inputs=Z_predict, outputs=X_mu_predict)
 
-# In[]: Initialization
+# In[]: Initialization noise: random empty var ,C=5, K=6, D2 shape fmri, all param =1
 Z_mu = np.mat(random.random(size=(numTrn,K))).astype(np.float32)
 B_mu = np.mat(random.random(size=(K,D2))).astype(np.float32)
 R_mu = np.mat(random.random(size=(numTrn,C))).astype(np.float32)
@@ -223,12 +223,15 @@ Y_mu = np.array(Z_mu * B_mu + R_mu * H_mu).astype(np.float32)
 Y_lsgms = np.log(1 / gamma_mu * np.ones((numTrn, D2))).astype(np.float32)
 
 savemat('data.mat', {'Y_train':Y_train,'Y_test':Y_test})
+#matlab engine
+# k = 10     # k-nearest neighbors
+# t = 10.0 # kernel parameter in similarity measure
 S=np.mat(eng.calculateS(float(k), float(t))).astype(np.float32)
 
 # In[]: Loop training
 for l in range(maxiter):
     print ('**************************************     iter= ', l)
-    # update Z
+    # update Z, DGMM = Model(inputs=[X, Y, Y_mu, Y_lsgms], outputs=X_mu)
     DGMM.fit([X_train, Y_train, Y_mu, Y_lsgms], X_train,
             shuffle=True,
             verbose=2,
