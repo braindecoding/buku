@@ -1,57 +1,59 @@
-# In[]: import
 import numpy as np
 from keras.layers import Input, Dense
 from keras.models import Model
 
-# In[]:Membangun Autoencoder
+# Membangun Autoencoder
 input_dim = 784  # Jumlah piksel dalam gambar MNIST
 latent_dim = 64  # Jumlah dimensi dalam ruang laten
+hidden_layers = [512, 256, 128, 64]  # Jumlah unit dalam setiap lapisan tersembunyi
 
-# In[]:Encoder
+# Encoder
 input_img = Input(shape=(input_dim,))
-encoded = Dense(128, activation='relu')(input_img)
-encoded = Dense(latent_dim, activation='relu')(encoded)
+x = input_img
+for units in hidden_layers:
+    x = Dense(units, activation='relu')(x)
+encoded = Dense(latent_dim, activation='relu')(x)
 
-# In[]:Decoder
-decoded = Dense(128, activation='relu')(encoded)
-decoded = Dense(input_dim, activation='sigmoid')(decoded)
+# Decoder
+x = encoded
+for units in hidden_layers[::-1]:
+    x = Dense(units, activation='relu')(x)
+decoded = Dense(input_dim, activation='sigmoid')(x)
 
-# In[]:Membangun model Autoencoder
+# Membangun model Autoencoder
 autoencoder = Model(input_img, decoded)
 
-# In[]:Membangun model Encoder terpisah
+# Membangun model Encoder terpisah
 encoder = Model(input_img, encoded)
-print("============================ encoder : =============================")
-encoder.summary()
-# In[]:Compile dan melatih Autoencoder
+
+# Compile dan melatih Autoencoder
 autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
-print("============================ Autoencoder : =============================")
-autoencoder.summary()
-# In[]:Memuat dan mempersiapkan data MNIST
+
+# Memuat dan mempersiapkan data MNIST
 from keras.datasets import mnist
 (x_train, _), (x_test, _) = mnist.load_data()
 
-# In[]:Normalisasi dan flatten data
+# Normalisasi dan flatten data
 x_train = x_train.astype('float32') / 255.
 x_test = x_test.astype('float32') / 255.
 x_train = x_train.reshape((len(x_train), np.prod(x_train.shape[1:])))
 x_test = x_test.reshape((len(x_test), np.prod(x_test.shape[1:])))
 
-# In[]:Melatih Autoencoder
+# Melatih Autoencoder
 autoencoder.fit(x_train, x_train,
                 epochs=10,
                 batch_size=256,
                 shuffle=True,
                 validation_data=(x_test, x_test))
 
-# In[]:Menggunakan Encoder untuk mendapatkan representasi ruang laten ukuran 64
+# Menggunakan Encoder untuk mendapatkan representasi ruang laten
 latent_representation = encoder.predict(x_test)
 
-# In[]:Contoh penggunaan ruang laten
+# Contoh penggunaan ruang laten
 sample_latent_vector = latent_representation[0]
 reconstructed_image = autoencoder.predict(np.array([sample_latent_vector]))
 
-# In[]:Menampilkan hasil rekonstruksi
+# Menampilkan hasil rekonstruksi
 import matplotlib.pyplot as plt
 
 original_image = x_test[0].reshape(28, 28)
