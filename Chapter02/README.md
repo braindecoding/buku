@@ -21,6 +21,49 @@ def sampling(args):
 z = Lambda(sampling)([z_mean, z_log_var])
 ```
 
+fungsi loss dalam VAE
+```py
+# Loss function VAE
+reconstruction_loss = mean_squared_error(K.flatten(input_fMRI), K.flatten(decoded))
+reconstruction_loss *= input_dim
+kl_loss = -0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1)
+vae_loss = K.mean(reconstruction_loss + kl_loss)
+
+vae.add_loss(vae_loss)
+```
+
+membangun VAE Model
+```py
+# Build VAE model
+encoder = Model(input_img, z_mean)
+decoder = Model(decoder_input, decoded)
+vae = Model(input_img, decoder(z))
+```
+untuk CVAE
+```py
+# Build CVAE model
+encoder = Model(encoder_inputs, [z_mean, z_log_var, z], name='encoder')
+decoder = Model(decoder_inputs, decoder_outputs, name='decoder')
+cvae_outputs = decoder(encoder(encoder_inputs)[2])
+cvae = Model(encoder_inputs, cvae_outputs, name='cvae')
+```
+
 # Deep Generative Mixture Model (DGMM) 
 
 # DGMM dengan fmri dan stimulus
+
+# Menggabungkan dua input gambar dan fmri
+
+```py
+input_shape = (width, height, channels)  # Dimensi gambar
+input_fMRI = Input(shape=(input_dim,))  # Input fMRI
+x = Reshape(input_shape)(input_fMRI)  # Reshape fMRI menjadi gambar dengan dimensi yang sesuai
+x = Conv2D(32, (3, 3), activation='relu')(x)
+x = MaxPooling2D((2, 2))(x)
+x = Conv2D(64, (3, 3), activation='relu')(x)
+x = MaxPooling2D((2, 2))(x)
+x = Conv2D(64, (3, 3), activation='relu')(x)
+x = Flatten()(x)
+x = Dense(64, activation='relu')(x)
+output = Dense(output_dim, activation='softmax')(x)  # Output gambar
+```
