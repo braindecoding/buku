@@ -124,8 +124,8 @@ def runOnGPU(model):
         model.fit()
 
 def loaddatanorest(mat):
-    mdata =mat['D']
-    mdtype = mdata .dtype 
+    mdata = mat['D']
+    mdtype = mdata.dtype 
     ndata = {n: mdata[n][0, 0] for n in mdtype.names}
     label = ndata['label']
     data = ndata['data']

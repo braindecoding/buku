@@ -34,10 +34,28 @@ def fromArch(i=0):
     allscoreresults=bdtb.simpanScore(label, pred, matfile, arch)
     return label,pred,allscoreresults
 
-def Miyawaki():
+def MiyawakiResults():
     predm,labelm,scorem=bdtb.simpanScoreMiyawaki()
     return labelm,predm,scorem
-
+# In[]: Load dataset
+def DataMiyawaki():
+    miyawakidata='de_s1_V1_Ecc1to11_baseByRestPre_smlr_s1071119ROI_resol10_leave0_1x1_preprocessed.mat'
+    Y_train,X_train=bdtb.getdatatrainfrommat(miyawakidata)
+    Y_test,X_test=bdtb.getdatatestfrommat(miyawakidata)
+    # In[]: X adalah gambar stimulus,ukuran pixel 28x28 = 784 di flatten sebelumnya dalam satu baris, 28 row x 28 column dengan channel 1(samaa kaya miyawaki)
+    resolution = 10
+    X_train = X_train.reshape([X_train.shape[0], resolution, resolution])
+    X_test = X_test.reshape([X_test.shape[0], resolution, resolution])
+    X_train = np.transpose(X_train, (0, 2, 1))
+    X_test = np.transpose(X_test, (0, 2, 1))
+    X_train = X_train.reshape([X_train.shape[0], resolution, resolution, 1])
+    X_test = X_test.reshape([X_test.shape[0], resolution, resolution, 1])
+    # In[]: Normlization sinyal fMRI, min max agar nilainya hanya antara 0 sd 1
+    min_max_scaler = preprocessing.MinMaxScaler(feature_range=(0, 1))   
+    Y_train = min_max_scaler.fit_transform(Y_train)     
+    Y_test = min_max_scaler.transform(Y_test)
+    return X_train,X_test,Y_train,Y_test
+# In[]: Load dataset
 def Data28():
     # In[]: Load dataset
     handwriten_69=loadmat('digit69_28x28.mat')
