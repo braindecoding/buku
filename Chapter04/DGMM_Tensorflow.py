@@ -186,7 +186,7 @@ def obj(X, X_mu):#loss function
 
 DGMM = Model(inputs=[X, Y, Y_mu, Y_lsgms], outputs=X_mu)
 
-opt_method = optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+opt_method = optimizers.legacy.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 
 DGMM.compile(optimizer = opt_method, loss = obj)
 DGMM.summary()
@@ -310,12 +310,20 @@ for j in range(1):
     for i in range(n):
         # display original images
         ax = plt.subplot(2, n, i +j*n*2 + 1)
-        plt.imshow(np.rot90(np.fliplr(X_test[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
+        plt.imshow(X_test[i+j*n].reshape(resolution ,resolution ),cmap='hot')
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
         # display reconstructed images
         ax = plt.subplot(2, n, i + n + j*n*2 + 1)
-        plt.imshow(np.rot90(np.fliplr(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ))),cmap='hot')
+        plt.imshow(X_reconstructed_mu[i+j*n].reshape(resolution ,resolution ),cmap='hot')
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
     plt.show()
+
+# In[]:
+from lib import plot
+X_reconstructed_mu = X_reconstructed_mu.reshape([X_reconstructed_mu.shape[0], resolution, resolution])
+X_test = X_test.reshape([X_test.shape[0], resolution, resolution])
+
+
+plot.tigaKolomGambar('Variational Autoencoder','Stimulus',X_test,'Rekonstruksi',X_reconstructed_mu,'Recovery',X_reconstructed_mu)

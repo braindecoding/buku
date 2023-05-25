@@ -38,7 +38,7 @@ X_train, X_test,Y_train,Y_test=loaddata.DataMiyawaki()
 maxiter = 200
 nb_epoch = 1
 batch_size = 10
-resolution = 28
+resolution = 10
 D1 = X_train.shape[1]*X_train.shape[2]*X_train.shape[3]
 D2 = Y_train.shape[1]
 K = 6
@@ -64,7 +64,7 @@ numTrn=X_train.shape[0]
 numTest=X_test.shape[0]
 
 # input image dimensions
-img_rows, img_cols, img_chns = 28, 28, 1
+img_rows, img_cols, img_chns = resolution, resolution, 1
 
 # number of convolutional filters to use
 filters = 64
@@ -189,7 +189,9 @@ def obj(X, X_mu):#loss function
 
 DGMM = Model(inputs=[X, Y, Y_mu, Y_lsgms], outputs=X_mu)
 
-opt_method = optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+#opt_method = optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+opt_method = optimizers.legacy.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+
 
 DGMM.compile(optimizer = opt_method, loss = obj)
 DGMM.summary()
