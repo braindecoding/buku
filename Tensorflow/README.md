@@ -164,6 +164,28 @@ Catatan: Contoh di atas adalah implementasi dasar dari VAE dan tidak termasuk pe
 
 2. **Loss function**: Ini adalah fungsi yang model coba minimalkan. Anda bisa merujuknya sebagai 'tujuan' yang model coba capai. Beberapa contoh loss function termasuk `mean_squared_error`, `categorical_crossentropy`, `binary_crossentropy`, dan lainnya.
 
+### Custom Loss Function
+Loss function adalah metrik yang digunakan untuk mengukur seberapa baik model belajar dari data. Pada beberapa kasus, loss function standar yang disediakan oleh Keras atau TensorFlow mungkin tidak cukup untuk menggambarkan tujuan optimasi yang tepat untuk model Anda. Dalam hal ini, Anda mungkin perlu mendefinisikan custom loss function.
+
+Berikut beberapa alasan mengapa Anda mungkin perlu membuat custom loss function:
+
+1. **Tujuan optimasi yang spesifik**: Misalnya, jika Anda bekerja pada suatu tugas yang perlu meminimalkan jenis kesalahan tertentu (seperti False Positives atau False Negatives) lebih dari jenis kesalahan lainnya, Anda mungkin ingin mendefinisikan loss function yang mencerminkan ini.
+
+2. **Ketergantungan kompleks pada fitur atau label**: Kadang, Anda mungkin ingin menentukan loss function yang mempertimbangkan interaksi yang kompleks atau nonlinier antara fitur atau antara fitur dan label. 
+
+3. **Regularisasi**: Anda mungkin ingin menambahkan bentuk regularisasi khusus ke loss function Anda yang tidak disediakan oleh Keras atau TensorFlow.
+
+Berikut adalah contoh bagaimana mendefinisikan custom loss function di TensorFlow:
+
+```python
+def custom_loss(y_true, y_pred):
+    return tf.reduce_mean(tf.square(y_true - y_pred))
+
+model.compile(optimizer='adam', loss=custom_loss)
+```
+
+Dalam contoh ini, `custom_loss` adalah fungsi yang mengambil label sebenarnya (`y_true`) dan prediksi dari model (`y_pred`) dan mengembalikan rata-rata dari kuadrat perbedaannya. Model akan mencoba meminimalkan nilai ini selama pelatihan. Jadi, dalam hal ini, `custom_loss` sama dengan mean squared error (MSE), tetapi Anda bisa mengganti rumus di dalamnya dengan apa pun yang sesuai dengan kebutuhan Anda.
+
 3. **Metrics**: Metrics digunakan untuk memantau kinerja model. Berbeda dengan loss function, metrics tidak digunakan saat pelatihan model tetapi digunakan untuk mengevaluasi kinerja model. Beberapa contoh metrics termasuk `accuracy`, `precision`, `recall`, dan lainnya.
 
 Berikut adalah contoh penggunaan `model.compile()`:
