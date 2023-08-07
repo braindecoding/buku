@@ -156,3 +156,22 @@ vae = Model(inputs, outputs)
 ```
 
 Catatan: Contoh di atas adalah implementasi dasar dari VAE dan tidak termasuk penanganan loss yang spesifik yang biasanya diperlukan dalam VAE. Biasanya, loss dari VAE terdiri dari dua bagian: bagian pertama adalah perbedaan antara input dan output (reconstruction loss), dan bagian kedua adalah divergence Kullback-Leibler antara distribusi yang dipelajari dan distribusi normal standar. Anda perlu menambahkan bagian ini jika Anda ingin melatih VAE.
+
+## Fungsi Model Compile
+`model.compile()` adalah fungsi di TensorFlow dan Keras yang digunakan untuk mengkonfigurasi proses belajar (learning process) sebelum pelatihan model. Fungsi ini menerima tiga argumen penting:
+
+1. **Optimizer**: Ini adalah algoritma yang digunakan untuk mengubah atribut dari model seperti bobot dan learning rate untuk mengurangi loss. Beberapa contoh optimizer termasuk SGD (Stochastic Gradient Descent), RMSprop, Adam, dan lainnya. Optimizer biasanya diteruskan sebagai string (nama dari optimizer) atau instance dari kelas optimizer.
+
+2. **Loss function**: Ini adalah fungsi yang model coba minimalkan. Anda bisa merujuknya sebagai 'tujuan' yang model coba capai. Beberapa contoh loss function termasuk `mean_squared_error`, `categorical_crossentropy`, `binary_crossentropy`, dan lainnya.
+
+3. **Metrics**: Metrics digunakan untuk memantau kinerja model. Berbeda dengan loss function, metrics tidak digunakan saat pelatihan model tetapi digunakan untuk mengevaluasi kinerja model. Beberapa contoh metrics termasuk `accuracy`, `precision`, `recall`, dan lainnya.
+
+Berikut adalah contoh penggunaan `model.compile()`:
+
+```python
+model.compile(optimizer='adam', 
+              loss='sparse_categorical_crossentropy', 
+              metrics=['accuracy'])
+```
+
+Pada contoh di atas, kita menggunakan Adam sebagai optimizer, sparse categorical crossentropy sebagai loss function, dan accuracy sebagai metric.
