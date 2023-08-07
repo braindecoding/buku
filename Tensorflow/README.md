@@ -157,6 +157,64 @@ vae = Model(inputs, outputs)
 
 Catatan: Contoh di atas adalah implementasi dasar dari VAE dan tidak termasuk penanganan loss yang spesifik yang biasanya diperlukan dalam VAE. Biasanya, loss dari VAE terdiri dari dua bagian: bagian pertama adalah perbedaan antara input dan output (reconstruction loss), dan bagian kedua adalah divergence Kullback-Leibler antara distribusi yang dipelajari dan distribusi normal standar. Anda perlu menambahkan bagian ini jika Anda ingin melatih VAE.
 
+### Fungsi Layer Lambda
+
+Layer `Lambda` di TensorFlow dan Keras digunakan untuk melibatkan operasi arbitrer atau fungsi sebagai layer dalam model Anda. `Lambda` layer bisa digunakan untuk menerapkan fungsi atau operasi sederhana yang tidak memerlukan bobot baru dan bisa didefinisikan dengan fungsi anonim atau lambda di Python.
+
+Berikut adalah beberapa contoh penggunaan `Lambda` layer:
+
+1. **Melakukan operasi matematika sederhana**: Misalnya, jika Anda ingin mengkuadratkan semua nilai dalam tensor, Anda dapat menggunakan `Lambda` layer.
+
+    ```python
+    from tensorflow.keras.layers import Lambda
+
+    # Membuat layer Lambda yang akan mengkuadratkan inputnya
+    square_layer = Lambda(lambda x: x ** 2)
+
+    # Anda bisa menggunakan layer ini seperti layer lainnya
+    output = square_layer(input_tensor)
+    ```
+
+2. **Mengubah bentuk tensor**: Kadang, Anda perlu mengubah bentuk tensor (misalnya, menggulung atau meratakan tensor). Anda dapat melakukan ini dengan `Lambda` layer.
+
+    ```python
+    from tensorflow.keras.layers import Lambda
+    import tensorflow.keras.backend as K
+
+    # Membuat layer Lambda yang akan menggulung inputnya
+    reshape_layer = Lambda(lambda x: K.reshape(x, (-1, num_rows * num_cols)))
+
+    # Anda bisa menggunakan layer ini seperti layer lainnya
+    output = reshape_layer(input_tensor)
+    ```
+
+3. **Menerapkan fungsi nonlinier**: Misalnya, jika Anda ingin menerapkan fungsi nonlinier tertentu yang tidak disediakan oleh Keras atau TensorFlow, Anda dapat melakukannya dengan `Lambda` layer.
+
+    ```python
+    from tensorflow.keras.layers import Lambda
+    import tensorflow as tf
+
+    # Membuat layer Lambda yang akan menerapkan fungsi nonlinier
+    nonlin_layer = Lambda(lambda x: tf.sin(x))
+
+    # Anda bisa menggunakan layer ini seperti layer lainnya
+    output = nonlin_layer(input_tensor)
+    ```
+
+4. **Menerapkan operasi kompleks**: Seperti yang kita lihat di contoh Variational Autoencoder sebelumnya, kita bisa menggunakan layer Lambda untuk melakukan operasi yang lebih kompleks, seperti sampling dari distribusi yang dipelajari.
+
+    ```python
+    def sampling(args):
+        z_mean, z_log_var = args
+        epsilon = K.random_normal(shape=(K.shape(z_mean)[0], latent_dim))
+        return z_mean + K.exp(0.5 * z_log_var) * epsilon
+
+    # Gunakan layer Lambda untuk melakukan sampling
+    z = Lambda(sampling)([z_mean, z_log_var])
+    ```
+
+Ingatlah bahwa layer Lambda tidak memiliki bobot, jadi mereka tidak dapat belajar dari gradient selama proses pelatihan. Jadi, mereka hanya harus digunakan untuk operasi yang tidak memerlukan pembelajaran.
+
 ## Fungsi Model Compile
 `model.compile()` adalah fungsi di TensorFlow dan Keras yang digunakan untuk mengkonfigurasi proses belajar (learning process) sebelum pelatihan model. Fungsi ini menerima tiga argumen penting:
 
